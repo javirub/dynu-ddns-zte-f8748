@@ -70,9 +70,17 @@ Regístrate en Dynu (gratis) y crea un hostname bajo cualquiera de sus dominios
 gratuitos (p. ej. `tucasa.freeddns.org`). En *Preferences → IP Update Password*
 puedes fijar una contraseña dedicada para actualizaciones (recomendado).
 
-### 2. Apunta el proveedor `dipc` a Dynu (consola del router)
+### 2. Apunta el proveedor `dipc` a Dynu (hay dos formas)
+
+El campo **"URL del proveedor" está bloqueado** (solo lectura) en la web, así que
+hay que **forzar** ese valor. Las dos vías siguientes son equivalentes: ambas
+acaban guardando el mismo `Server` del proveedor `dipc`
+(`DDNSService` / `IGD.DDNSS4`). Elige la que prefieras.
+
+#### Método A — Consola / script (robusto y verificado)
+
 Entra por SSH a la consola del router (BusyBox `ash`) y cambia el **Server** del
-proveedor `dipc` en la base de datos de configuración:
+proveedor `dipc` en la base de datos:
 
 ```sh
 # Verifica primero en qué fila está "dipc" (en firmware de stock suele ser la 3):
@@ -88,16 +96,44 @@ sendcmd 1 DB save
 
 > `DDNSService` fila `3` = `dipc`. Si en tu equipo está en otra fila, usa ese índice.
 
-> 💡 **¿Prefieres no hacerlo a mano?** El script [`scripts/dipc-dynu.py`](scripts/dipc-dynu.py)
-> automatiza este paso: **abre** el SSH de fábrica, **cambia** la URL del proveedor
-> `dipc` y **cierra** el SSH, de una sola ejecución. No toca usuario/clave/host de
-> Dynu (eso va en la web). Ver [`AGENTS.md`](AGENTS.md).
-> ```bash
-> python scripts/dipc-dynu.py aplicar \
->     --digi-tool /ruta/a/digi-f8748.py \
->     --router-mac AA-BB-CC-DD-EE-FF \
->     --web-user user --web-pass 'TU_PASS_WEB'
-> ```
+El script [`scripts/dipc-dynu.py`](scripts/dipc-dynu.py) **automatiza** este método
+(**abre** el SSH de fábrica, **cambia** la URL y **cierra** el SSH, de una pasada).
+No toca usuario/clave/host de Dynu (eso va en la web). Ver [`AGENTS.md`](AGENTS.md).
+```bash
+python scripts/dipc-dynu.py aplicar \
+    --digi-tool /ruta/a/digi-f8748.py \
+    --router-mac AA-BB-CC-DD-EE-FF \
+    --web-user user --web-pass 'TU_PASS_WEB'
+```
+
+#### Método B — Navegador (F12, sin SSH)
+
+Sin armar el SSH de fábrica. En el panel del router → **DDNS**, con `dipc`
+seleccionado, abre la **consola del navegador (F12)** y pega:
+
+```js
+var u = "http://gnudip.dynu.com/gnudip/cgi-bin/gdipupdt.cgi";
+$("#Provider option[value='dipc']").attr("serviceurl", u);  // <- la clave
+$("#Provider").val("dipc").change();                         // propaga a #Server
+```
+
+Luego rellena usuario/clave/host de Dynu y pulsa **Aplicar**. El propio JS
+reconstruye la petición (incluido el campo cifrado `encode`) con la URL de Dynu, y
+cspd la guarda. 
+
+> ⚠️ El campo **visible** "URL del proveedor" es **cosmético**: lo que cuenta es el
+> **atributo `serviceurl`** de la opción, que es justo lo que cambia el snippet.
+> Editar solo el campo visible **no** cambia el valor guardado.
+
+#### ¿A o B?
+
+| | SSH/consola | Dependencias | Fragilidad | Automatizable |
+|---|---|---|---|---|
+| **A (script)** | Sí (fábrica) | Python + DIGI-F8748 | Baja (ajeno al HTML) | Sí |
+| **B (navegador)** | **No** | Solo el navegador | Media (depende del HTML/JS) | No |
+
+- **B** es lo más cómodo para hacerlo tú, una vez y rápido (sin SSH).
+- **A** es mejor si quieres algo reproducible/scriptable o automatizar varios equipos.
 
 *(Opcional, para comprobar el cliente GnuDIP a mano antes de la web):*
 ```sh

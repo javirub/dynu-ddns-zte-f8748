@@ -20,6 +20,10 @@ username/password/host — you set those later in the web panel.
 > Full flow: `run the script` (changes the locked URL) → `go to the web`
 > (DDNS → `dipc` → Dynu username + password + host + WAN interface → Apply).
 
+> ℹ️ **No-SSH alternative:** the same change can be forced from the **browser
+> console (F12)** without arming the factory SSH at all — see *"Method B"* in the
+> [README](README.md). This script is the robust/scriptable route (Method A).
+
 ## What it is based on
 
 On the **[DIGI-F8748](https://github.com/686f6c61/DIGI-F8748)** tool by 686f6c61,
