@@ -88,6 +88,17 @@ sendcmd 1 DB save
 
 > `DDNSService` fila `3` = `dipc`. Si en tu equipo está en otra fila, usa ese índice.
 
+> 💡 **¿Prefieres no hacerlo a mano?** El script [`scripts/dipc-dynu.py`](scripts/dipc-dynu.py)
+> automatiza este paso: **abre** el SSH de fábrica, **cambia** la URL del proveedor
+> `dipc` y **cierra** el SSH, de una sola ejecución. No toca usuario/clave/host de
+> Dynu (eso va en la web). Ver [`AGENTS.md`](AGENTS.md).
+> ```bash
+> python scripts/dipc-dynu.py aplicar \
+>     --digi-tool /ruta/a/digi-f8748.py \
+>     --router-mac AA-BB-CC-DD-EE-FF \
+>     --web-user admin --web-pass 'TU_PASS_ADMIN'
+> ```
+
 *(Opcional, para comprobar el cliente GnuDIP a mano antes de la web):*
 ```sh
 dipc -s gnudip.dynu.com -t HTTP -o 80 -l /gnudip/cgi-bin/gdipupdt.cgi \
