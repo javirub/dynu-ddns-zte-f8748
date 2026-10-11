@@ -56,7 +56,7 @@ def _digi_cmd(tool, action):
 def abrir_ssh(tool, host, mac, web_user, web_pass):
     """Arma el SSH de fabrica y devuelve (usuario, contrasena) temporales."""
     cmd = _digi_cmd(tool, "arm") + [
-        "--host", host, "--router-mac", mac, "-keep", "-y",
+        "--host", host, "--router-mac", mac, "--keep-ssh", "-y",
         "--web-user", web_user, "--web-pass", web_pass,
     ]
     r = subprocess.run(cmd, capture_output=True, text=True)
@@ -94,6 +94,9 @@ def ejecutar_en_router(host, user, pw, comandos, intentos=4):
         try:
             t = paramiko.Transport((host, 22))
             t.start_client(timeout=20)
+            # El dropbear de fabrica (BusyBox 1.17.2) es fragil: un keepalive
+            # mantiene viva la sesion y detecta cortes rapido para reintentar.
+            t.set_keepalive(15)
             t.auth_password(user, pw)
             ch = t.open_session()
             ch.get_pty(width=250, height=200)

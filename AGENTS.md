@@ -80,7 +80,7 @@ python scripts/dipc-dynu.py cerrar \
 
 ## How "open" and "close" work (and how to adapt it)
 
-- **Open** = `digi-f8748 arm --host <ip> --router-mac <mac> -keep -y --web-user <u> --web-pass <p>`.
+- **Open** = `digi-f8748 arm --host <ip> --router-mac <mac> --keep-ssh -y --web-user <u> --web-pass <p>`.
   The script **parses** the `factory SSH armado - user: X pass: Y` line from the
   output and uses those temporary `X`/`Y` for the SSH (paramiko) to the router.
 - **Close** = `digi-f8748 disarm --host <ip> --router-mac <mac> -y`.
